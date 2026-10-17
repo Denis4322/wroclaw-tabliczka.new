@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WROCŁAW Таблиця Відправлення</title>
+    <style>
+        body { font-family: sans-serif; background-color: #f4f4f4; text-align: center; padding: 20px; }
+        .tab-wrapper { background: #fff; padding: 20px; border-radius: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); max-width: 600px; margin: 0 auto; }
+        h1 { color: #333; }
+        select { width: 100%; padding: 10px; margin-bottom: 20px; border-radius: 5px; border: 1px solid #ccc; font-size: 16px; }
+        .departure-row { display: flex; justify-content: space-between; padding: 10px; border-bottom: 1px solid #eee; }
+        .departure-row:last-child { border-bottom: none; }
+        .line { font-weight: bold; color: #d9534f; width: 50px; text-align: left; }
+        .destination { text-align: left; flex-grow: 1; margin-left: 10px; }
+        .time { color: #5cb85c; font-weight: bold; width: 70px; text-align: right; }
+        #status { font-style: italic; color: #777; margin-bottom: 10px; }
+        #departures { display: none; }
+    </style>
+</head>
+<body>
+
+<div class="tab-wrapper">
+    <h1>WROCŁAW</h1>
+    <h3>Таблиця Відправлення MPK</h3>
+    <div id="status">Завантаження розкладу...</div>
+    <select id="stopSelect" onchange="loadDepartures()">
+        <option value="" disabled selected>Виберіть зупинку...</option>
+    </select>
+
+    <div id="departures">
+        <!-- departures will be added here -->
+    </div>
+</div>
+
+<script>
+    const API_URL = "https://wroclaw.pl/pliki/rozklady-jazdy/departures.json"; // API, що не потребує аутентифікації
+    let departureData = [];
+
+    async function fetchDepartures() {
+        try {
+            const response = await fetch(API_URL);
+            departureData = await response.json();
+            const statusDiv = document.getElementById('status');
+            const select = document.getElementById('stopSelect');
+
+            if (departureData && departureData.length > 0) {
+                statusDiv.textContent = 'Розклад оновлено. Виберіть зупинку.';
+                populateStopSelect();
+            } else {
+                statusDiv.textContent = 'Помилка: дані не знайдено.';
+            }
+        } catch (error) {
+            document.getElementById('status').textContent = 'Помилка завантаження даних.';
+            console.error('Fetch error:', error);
+        }
+    }
+
+    function populateStopSelect() {
+        const select = document.getElementById('stopSelect');
+        const uniqueStops = [...new Set(departureData.map(d => d.StopName))];
+        uniqueStops.sort();
+
+        uniqueStops.forEach(stopName => {
+            const option = document.createElement('option');
+            option.value = stopName;
+            option.textContent = stopName;
+            select.appendChild(option);
+        });
+    }
+
+    function loadDepartures() {
+        const select = document.getElementById('stopSelect');
+        const departuresDiv = document.getElementById('departures');
+        const selectedStop = select.value;
+        departuresDiv.innerHTML = '';
+        departuresDiv.style.display = 'block';
+
+        const filteredDepartures = departureData.filter(d => d.StopName === selectedStop);
+
+        if (filteredDepartures.length === 0) {
+            departuresDiv.innerHTML = 'Нічого не знайдено для цієї зупинки.';
+            return;
+        }
+
+        filteredDepartures.forEach(dep => {
+            const departureRow = document.createElement('div');
+            departureRow.className = 'departure-row';
+            departureRow.innerHTML = `
+                <span class="line">${dep.Line}</span>
+                <span class="destination">${dep.Destination}</span>
+                <span class="time">${dep.TimeToDeparture} min</span>
+            `;
+            departuresDiv.appendChild(departureRow);
+        });
+    }
+
+    fetchDepartures();
+</script>
+
+</body>
+</html>
