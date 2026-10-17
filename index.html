@@ -1,102 +1,26 @@
-<!DOCTYPE html>
-<html lang="uk">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WROCŁAW Таблиця Відправлення</title>
-    <style>
-        body { font-family: sans-serif; background-color: #f4f4f4; text-align: center; padding: 20px; }
-        .tab-wrapper { background: #fff; padding: 20px; border-radius: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); max-width: 600px; margin: 0 auto; }
-        h1 { color: #333; }
-        select { width: 100%; padding: 10px; margin-bottom: 20px; border-radius: 5px; border: 1px solid #ccc; font-size: 16px; }
-        .departure-row { display: flex; justify-content: space-between; padding: 10px; border-bottom: 1px solid #eee; }
-        .departure-row:last-child { border-bottom: none; }
-        .line { font-weight: bold; color: #d9534f; width: 50px; text-align: left; }
-        .destination { text-align: left; flex-grow: 1; margin-left: 10px; }
-        .time { color: #5cb85c; font-weight: bold; width: 70px; text-align: right; }
-        #status { font-style: italic; color: #777; margin-bottom: 10px; }
-        #departures { display: none; }
-    </style>
-</head>
-<body>
-
-<div class="tab-wrapper">
-    <h1>WROCŁAW</h1>
-    <h3>Таблиця Відправлення MPK</h3>
-    <div id="status">Завантаження розкладу...</div>
-    <select id="stopSelect" onchange="loadDepartures()">
-        <option value="" disabled selected>Виберіть зупинку...</option>
-    </select>
-
-    <div id="departures">
-        <!-- departures will be added here -->
-    </div>
-</div>
-
+<!doctype html>
+<html lang="pl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#b51224"><title>Tabliczka Wrocław — rozkłady MPK</title>
+<style>
+:root{--red:#bd1728;--ink:#17232c;--muted:#64727b;--line:#dbe1e5;--bg:#f1f4f6;--paper:#fff}*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.45 system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}header{background:#17232c;color:white;padding:18px max(16px,calc((100% - 1050px)/2));display:flex;align-items:center;gap:12px}.mark{font-weight:950;font-size:19px;border:2px solid #fff;padding:4px 8px;letter-spacing:.05em}header strong{display:block;letter-spacing:.05em}header small{color:#c8d2d8}main{max-width:1050px;margin:24px auto;padding:0 14px}.panel{background:#fff;border:1px solid var(--line);border-radius:12px;padding:20px;margin-bottom:16px;box-shadow:0 3px 14px #17232c08}h1{font-size:25px;margin:0 0 4px}h2{font-size:17px;margin:0 0 13px}.muted{color:var(--muted)}.intro{margin:0 0 20px;color:var(--muted)}.grid{display:grid;grid-template-columns:1fr 1.6fr 1fr 1fr;gap:12px}label{display:block;font-size:12px;font-weight:800;margin:0 0 5px;color:#52616b}input,select,button{width:100%;font:inherit;padding:11px 12px;border:1px solid #c8d2d8;border-radius:8px;background:#fff;color:var(--ink);min-width:0}button{border:0;background:var(--red);color:#fff;font-weight:800;cursor:pointer}button:disabled{opacity:.45;cursor:not-allowed}.secondary{background:#263944}.status{margin-top:12px;font-size:13px;color:var(--muted)}.status.error{color:#b42318}.status.ok{color:#147444}.hidden{display:none!important}.board{background:#fff;border:1px solid #aeb9bf;border-radius:4px;overflow:hidden}.boardhead{display:grid;grid-template-columns:130px 1fr 1.2fr;gap:15px;padding:18px;border-bottom:2px solid #17232c}.eyebrow{font-size:10px;font-weight:900;letter-spacing:.1em;text-transform:uppercase;color:#667680}.linebig{font-size:56px;font-weight:950;line-height:1;letter-spacing:-2px}.dest{font-size:21px;font-weight:850;margin-top:5px}.boardmeta{padding:12px 18px;background:#f6f8f9;border-bottom:1px solid var(--line);font-size:13px;display:flex;flex-wrap:wrap;gap:12px}.timetable{padding:16px 18px}.stopTitle{font-size:21px;font-weight:900;margin:0 0 3px}.directionTitle{font-size:14px;color:var(--muted);margin-bottom:14px}.hours{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));border-top:1px solid var(--line);border-left:1px solid var(--line)}.hour{padding:10px;border-right:1px solid var(--line);border-bottom:1px solid var(--line);min-height:54px}.hour b{display:inline-block;width:34px;font-size:18px}.mins{font-variant-numeric:tabular-nums;font-size:15px;word-spacing:4px}.foot{font-size:12px;color:var(--muted);margin:14px 2px 0}.actions{display:flex;gap:10px;margin-top:14px}.actions button{max-width:240px}.loading{display:inline-block;width:14px;height:14px;border:2px solid #d9dfe3;border-top-color:var(--red);border-radius:50%;animation:spin .8s linear infinite;vertical-align:middle;margin-right:6px}@keyframes spin{to{transform:rotate(360deg)}}@media(max-width:760px){.grid{grid-template-columns:1fr 1fr}.boardhead{grid-template-columns:90px 1fr}.boardhead>div:last-child{grid-column:1/-1}.linebig{font-size:46px}.hours{grid-template-columns:repeat(2,minmax(0,1fr))}}@media(max-width:450px){main{margin:14px auto}.panel{padding:14px}.grid{grid-template-columns:1fr}.boardhead{padding:12px;gap:9px}.timetable{padding:12px}.hour{padding:8px}.actions{flex-direction:column}.actions button{max-width:none}}@media print{body{background:#fff}header,.controlsPanel,.actions,.foot,.status{display:none!important}main{max-width:none;margin:0;padding:0}.panel{border:0;box-shadow:none;padding:0}.board{border:1px solid #333}.hours{grid-template-columns:repeat(4,minmax(0,1fr)}}
+</style></head><body>
+<header><div class="mark">MPK</div><div><strong>WROCŁAW · TABLICZKA</strong><small>Generator tabliczek przystankowych autobusów i tramwajów</small></div></header>
+<main><section class="panel controlsPanel"><h1>Rozkład jazdy na przystanku</h1><p class="intro">Wpisz numer linii, wybierz kierunek i dowolny przystanek. Rozkład zostanie przygotowany automatycznie z danych MPK Wrocław.</p>
+<div class="grid"><div><label for="line">Linia</label><input id="line" list="routeOptions" placeholder="np. 125" autocomplete="off"><datalist id="routeOptions"></datalist></div><div><label for="stop">Przystanek</label><input id="stop" list="stopOptions" placeholder="Najpierw wpisz linię" autocomplete="off" disabled><datalist id="stopOptions"></datalist></div><div><label for="direction">Kierunek</label><select id="direction" disabled><option value="">Wszystkie kierunki</option></select></div><div><label for="date">Data</label><input id="date" type="date" disabled></div></div>
+<div class="status" id="status"><span class="loading"></span>Ładowanie aktualnych danych rozkładowych…</div><div class="foot">Źródło: <a href="https://open-data.cui.wroclaw.pl/hdb/ft/6/" target="_blank" rel="noreferrer">OpenData Wrocław</a>. Dane są pobierane automatycznie przez GitHub Actions i aktualizowane codziennie.</div></section>
+<section class="panel hidden" id="result"><div class="board" id="board"></div><div class="actions"><button id="print" class="secondary">Drukuj / zapisz PDF</button><button id="clear">Wyczyść wybór</button></div><div class="foot" id="meta"></div></section></main>
 <script>
-    const API_URL = "https://wroclaw.pl/pliki/rozklady-jazdy/departures.json"; // API, що не потребує аутентифікації
-    let departureData = [];
-
-    async function fetchDepartures() {
-        try {
-            const response = await fetch(API_URL);
-            departureData = await response.json();
-            const statusDiv = document.getElementById('status');
-            const select = document.getElementById('stopSelect');
-
-            if (departureData && departureData.length > 0) {
-                statusDiv.textContent = 'Розклад оновлено. Виберіть зупинку.';
-                populateStopSelect();
-            } else {
-                statusDiv.textContent = 'Помилка: дані не знайдено.';
-            }
-        } catch (error) {
-            document.getElementById('status').textContent = 'Помилка завантаження даних.';
-            console.error('Fetch error:', error);
-        }
-    }
-
-    function populateStopSelect() {
-        const select = document.getElementById('stopSelect');
-        const uniqueStops = [...new Set(departureData.map(d => d.StopName))];
-        uniqueStops.sort();
-
-        uniqueStops.forEach(stopName => {
-            const option = document.createElement('option');
-            option.value = stopName;
-            option.textContent = stopName;
-            select.appendChild(option);
-        });
-    }
-
-    function loadDepartures() {
-        const select = document.getElementById('stopSelect');
-        const departuresDiv = document.getElementById('departures');
-        const selectedStop = select.value;
-        departuresDiv.innerHTML = '';
-        departuresDiv.style.display = 'block';
-
-        const filteredDepartures = departureData.filter(d => d.StopName === selectedStop);
-
-        if (filteredDepartures.length === 0) {
-            departuresDiv.innerHTML = 'Нічого не знайдено для цієї зупинки.';
-            return;
-        }
-
-        filteredDepartures.forEach(dep => {
-            const departureRow = document.createElement('div');
-            departureRow.className = 'departure-row';
-            departureRow.innerHTML = `
-                <span class="line">${dep.Line}</span>
-                <span class="destination">${dep.Destination}</span>
-                <span class="time">${dep.TimeToDeparture} min</span>
-            `;
-            departuresDiv.appendChild(departureRow);
-        });
-    }
-
-    fetchDepartures();
-</script>
-
-</body>
-</html>
+const $=id=>document.getElementById(id);let DATA=null,chosenRoute=null,chosenStop=null;
+const today=()=>{const d=new Date();return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`};$('date').value=today();
+function setStatus(s,cls=''){ $('status').textContent=s;$('status').className='status '+cls }
+function norm(s){return (s||'').toLocaleLowerCase('pl').normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim()}
+function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function routeName(r){return r.name||r.id}
+function findRoute(v){const n=norm(v);return DATA?.routes.find(r=>norm(routeName(r))===n||norm(r.id)===n)}
+function fillRoutes(){const dl=$('routeOptions');dl.innerHTML='';DATA.routes.slice().sort((a,b)=>routeName(a).localeCompare(routeName(b),'pl',{numeric:true})).forEach(r=>{const o=document.createElement('option');o.value=routeName(r);dl.append(o)});$('date').disabled=false;setStatus(`Gotowe — baza zawiera ${DATA.routes.length} linii i ${DATA.stopNames.length} przystanków. Wpisz numer linii.`,'ok')}
+function lineChanged(){const r=findRoute($('line').value);chosenRoute=r;chosenStop=null;$('result').classList.add('hidden');$('stop').value='';$('direction').innerHTML='<option value="">Wszystkie kierunki</option>';if(!r){$('stop').disabled=true;$('direction').disabled=true;$('stop').placeholder='Najpierw wpisz linię';return}const stops=new Map();const dirs=new Set();for(const t of r.trips){dirs.add(t.headsign||'Kierunek nieznany');for(const c of t.calls)stops.set(c.stop_id,DATA.stopMap[c.stop_id]||c.stop_id)}const dl=$('stopOptions');dl.innerHTML='';[...stops].sort((a,b)=>a[1].localeCompare(b[1],'pl')).forEach(([id,name])=>{const o=document.createElement('option');o.value=name; o.dataset.id=id;dl.append(o)});$('stop').disabled=false;$('stop').placeholder=`Wybierz jeden z ${stops.size} przystanków`;$('direction').disabled=false;[...dirs].sort((a,b)=>a.localeCompare(b,'pl')).forEach(d=>{const o=document.createElement('option');o.value=d;o.textContent=d;$('direction').append(o)});setStatus(`Linia ${routeName(r)}: znaleziono ${dirs.size} kierunków i ${stops.size} przystanków. Wybierz przystanek.`,'ok')}
+function serviceActive(serviceId,date){const ds=date.replaceAll('-','');const cal=DATA.calendar[serviceId];let yes=false;if(cal&&ds>=cal.start_date&&ds<=cal.end_date){const day=['sunday','monday','tuesday','wednesday','thursday','friday','saturday'][new Date(date+'T12:00:00').getDay()];yes=cal[day]==='1'}for(const x of (DATA.exceptions[ds]||[])){if(x.service_id===serviceId)yes=x.exception_type==='1'}return yes}
+function selectedStopId(){const v=norm($('stop').value);if(!v||!chosenRoute)return null;const all=new Map();chosenRoute.trips.forEach(t=>t.calls.forEach(c=>all.set(c.stop_id,DATA.stopMap[c.stop_id]||c.stop_id)));for(const [id,name] of all)if(norm(name)===v)return id;return null}
+function render(){if(!chosenRoute){setStatus('Wpisz prawidłowy numer linii.','error');return}const sid=selectedStopId();if(!sid){setStatus('Wybierz przystanek z listy podpowiedzi.','error');return}const date=$('date').value||today();const active=chosenRoute.trips.filter(t=>serviceActive(t.service_id,date)&&(! $('direction').value||t.headsign===$('direction').value));const rows=[];for(const t of active){for(const c of t.calls){if(c.stop_id===sid){const time=c.departure||c.arrival;if(time)rows.push({time,headsign:t.headsign,trip:t.trip_id});break}}}rows.sort((a,b)=>a.time.localeCompare(b.time));const stopName=chosenRoute.trips.flatMap(t=>t.calls).find(c=>c.stop_id===sid)? (DATA.stopMap[sid]||sid) : $('stop').value;const dirs=[...new Set(rows.map(x=>x.headsign))];const grouped={};for(const x of rows){const [h,m]=x.time.split(':');(grouped[h]??=[]).push(m)}let table='';for(const h of Object.keys(grouped).sort((a,b)=>+a-+b)){const mins=grouped[h].sort((a,b)=>+a-+b);table+=`<div class="hour"><b>${esc(h)}</b><span class="mins">${mins.map(esc).join(' · ')}</span></div>`}const type=chosenRoute.type==='tram'?'TRAMWAJ':'AUTOBUS';$('board').innerHTML=`<div class="boardhead"><div><div class="eyebrow">Linia</div><div class="linebig">${esc(routeName(chosenRoute))}</div><div class="eyebrow">${type}</div></div><div><div class="eyebrow">Przystanek</div><div class="dest">${esc(stopName)}</div><div>${esc($('direction').value||'Wszystkie kierunki')}</div></div><div><div class="eyebrow">Rozkład obowiązuje na dzień</div><div class="dest">${new Date(date+'T12:00:00').toLocaleDateString('pl-PL',{day:'2-digit',month:'long',year:'numeric'})}</div><div class="muted">${['niedziela','poniedziałek','wtorek','środa','czwartek','piątek','sobota'][new Date(date+'T12:00:00').getDay()]}</div></div></div><div class="boardmeta"><span><b>${rows.length}</b> odjazdów</span><span>${dirs.length} kierunek/kierunki</span><span>Dane GTFS · Wrocław</span></div><div class="timetable"><div class="stopTitle">${esc(stopName)}</div><div class="directionTitle">${esc($('direction').value||dirs.join(' / ')||'Brak kierunku')} · godziny i minuty odjazdów</div><div class="hours">${table||'<div class="hour" style="grid-column:1/-1">Brak kursów dla tej daty i wybranego kierunku.</div>'}</div></div>`;$('meta').textContent=`Źródło danych: oficjalny GTFS Wrocław. Ostatnia aktualizacja bazy: ${DATA.generated||'nieznana'}. W razie zmiany rozkładu sprawdź również oficjalny portal MPK.`;$('result').classList.remove('hidden');setStatus(`Wygenerowano rozkład: ${rows.length} odjazdów.`,'ok')}
+$('line').addEventListener('input',lineChanged);$('line').addEventListener('change',lineChanged);$('stop').addEventListener('change',render);$('stop').addEventListener('input',()=>{if(selectedStopId())render()});$('direction').addEventListener('change',()=>{if($('stop').value)render()});$('date').addEventListener('change',()=>{if($('stop').value)render()});$('print').onclick=()=>window.print();$('clear').onclick=()=>{$('line').value='';$('stop').value='';$('result').classList.add('hidden');chosenRoute=null;chosenStop=null;$('stop').disabled=true;$('direction').disabled=true;$('direction').innerHTML='<option value="">Wszystkie kierunki</option>';setStatus('Wpisz numer linii, aby zacząć.','ok')};
+fetch('./data.json',{cache:'no-store'}).then(r=>{if(!r.ok)throw Error('Brak data.json — automatyczne pobranie danych jeszcze się nie zakończyło.');return r.json()}).then(d=>{DATA=d;fillRoutes()}).catch(e=>setStatus('Nie udało się wczytać bazy: '+e.message+' Odśwież stronę później lub sprawdź zakładkę Actions w GitHub.','error'));
+</script></body></html>
